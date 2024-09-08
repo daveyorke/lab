@@ -1,0 +1,52 @@
+---
+- name: Install prometheus
+  hosts: prometheus
+  become: true
+
+  tasks:
+  - name: Disable SELinux
+    ansible.posix.selinux:
+      state: disabled
+  - name: download binary
+    ansible.builtin.get_url:
+      url: https://github.com/prometheus/prometheus/releases/download/v2.54.1/prometheus-2.54.1.linux-amd64.tar.gz
+      dest: /tmp/prometheus-2.54.1.linux-amd64.tar.gz
+  - name: extract binary
+    ansible.builtin.unarchive:
+      src: /tmp/prometheus-2.54.1.linux-amd64.tar.gz
+      dest: /tmp
+      remote_src: true
+  - name: copy prometheus binary to /usr/local/bin
+    ansible.builtin.copy:
+      src: /tmp/prometheus-2.54.1.linux-amd64/prometheus
+      dest: /usr/local/bin
+      remote_src: true
+      mode: '0755'
+  - name: copy promtool binary to /usr/local/bin
+    ansible.builtin.copy:
+      src: /tmp/prometheus-2.54.1.linux-amd64/promtool
+      dest: /usr/local/bin
+      remote_src: true
+      mode: '0755'
+  - name: create /etc/prometheus directory
+    ansible.builtin.file:
+      path: /etc/prometheus
+      state: directory
+      mode: '0755'
+  - name: copy prometheus config
+    ansible.builtin.copy:
+      src: ./files/prometheus.yml
+      dest: /etc/prometheus
+  - name: copy prometheus service
+    ansible.builtin.copy:
+      src: ./files/prometheus.service
+      dest: /etc/systemd/system
+  - name: Reload daemon and start prometheus
+    ansible.builtin.systemd_service:
+      state: started
+      enabled: true
+      daemon_reload: true
+      name: prometheus
+
+
+
