@@ -1,0 +1,5 @@
+[rocky]
+rocky9-01.dave.lan
+
+[rockyip]
+192.168.88.101
