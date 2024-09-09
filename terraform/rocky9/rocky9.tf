@@ -1,4 +1,4 @@
-resource "proxmox_vm_qemu" "k8s-workers" {
+resource "proxmox_vm_qemu" "rocky_linux" {
     count = 1
     name = "rocky9-0${count.index + 1}"
     desc = "A test for using terraform and cloudinit"
